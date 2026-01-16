@@ -180,8 +180,151 @@ if GetLocale() == "ptBR" then
 end
 
 if GetLocale() == "ruRU" then
-	L["Thank you for installing WeaponSwingTimer Version"] = "Спасибо за установку версии WeaponSwingTimer"
-	L["by Skad! Use |cFFFFC300/wst|r for more options."] = "Skad! Используйте |cFFFFC300/wst|r для получения дополнительных опций."
+	-- Translator ZamestoTV	
+	-- Core
+	L["Thank you for installing WeaponSwingTimer Version"] = "Спасибо за установку WeaponSwingTimer версии"
+	L["by Skad! Use |cFFFFC300/wst|r for more options."] = "от Skad! Используйте |cFFFFC300/wst|r для дополнительных настроек."
+	L["Unexpected Unit Type in MissHandler()."] = "Неожиданный тип юнита в MissHandler()."
+	L["Unexpected Unit Type in SpellHandler()."] = "Неожиданный тип юнита в SpellHandler()."
+
+	-- Config
+	L["Global Bar Settings"] = "Общие настройки полос"
+	L["Melee Settings"] = "Настройки ближнего боя"
+	L["Hunter & Wand Settings"] = "Настройки охотника и жезлов"
+	L[" Lock All Bars"] = " Заблокировать все полосы"
+	L["Locks all of the swing bar frames, preventing them from being dragged."] = "Блокирует все полосы взмахов, запрещая их перемещение."
+	L[" Welcome Message"] = " Приветственное сообщение"
+	L["Displays the welcome message upon login/reload. Uncheck to disable."] = "Показывает приветственное сообщение при входе/перезагрузке UI. Снимите галочку, чтобы отключить."
+
+	-- Player
+	L["Player Swing Bar Settings"] = "Настройки полосы игрока"
+	L["Enables the player's swing bars."] = "Включает полосы взмахов игрока."
+	L["Enables the player's off-hand swing bar."] = "Включает полосу взмаха второй рукой."
+	L["Enables the player bar's border."] = "Включает рамку полосы игрока."
+	L["Enables the classic texture for the player's bars."] = "Включает классическую текстуру для полос игрока."
+	L["Enables the player's left side text."] = "Включает текст слева на полосе игрока."
+	L["Enables the player's right side text."] = "Включает текст справа на полосе игрока."
+
+	L["Show Paladin Twist"] = "Показывать твист паладина"
+	L["Show 0.4s marker before swing to help with seal twisting. Apply seal after this."] = "Показывает маркер за 0,4 сек до удара для помощи с твистом печатей. Наносите печать после маркера."
+	L["Show Paladin GCD"] = "Показывать ГКД паладина"
+	L["Show GCD marker before swing to help with seal twisting. Apply first seal before this."] = "Показывает маркер ГКД перед ударом для помощи с твистом печатей. Наносите первую печать до маркера."
+	L["Paladin Marker offset"] = "Смещение маркера паладина"
+
+	-- Target
+	L["Target Swing Bar Settings"] = "Настройки полосы цели"
+	L["Enables the target's swing bars."] = "Включает полосы взмахов цели."
+	L["Enables the target's off-hand swing bar."] = "Включает полосу взмаха второй рукой цели."
+	L["Enables the target bar's border."] = "Включает рамку полосы цели."
+	L["Enables the classic texture for the target's bars."] = "Включает классическую текстуру для полос цели."
+	L["Enables the target's left side text."] = "Включает текст слева на полосе цели."
+	L["Enables the target's right side text."] = "Включает текст справа на полосе цели."
+
+	-- Shot
+	L["Failed"] = "Промах"
+	L["Interrupted"] = "Прервано"
+	L["Hunter & Wand Shot Bar Settings"] = "Настройки полосы выстрела охотника и жезлов"
+	L["General Settings"] = "Общие настройки"
+	L["YaHT / One bar"] = "YaHT / Одна полоса"
+	L["Changes the Auto Shot bar to a single bar that fills from left to right"] = "Превращает полосу Автоматическую стрельбу в одну полосу, заполняющуюся слева направо"
+	L["Show Text"] = "Показывать текст"
+	L["Show Cast Text"] = "Показывать текст каста"
+	L["Enables the shot bar text."] = "Включает текст на полосе выстрела."
+	L["Enables the cast bar text."] = "Включает текст на полосе каста."
+	L["Auto Shot Cooldown Color"] = "Цвет кулдауна Автоматической стрельбы"
+	L["Auto Shot Cast Color"] = "Цвет каста Автоматической стрельбы"
+
+	L["Hunter Specific Settings"] = "Специфические настройки охотника"
+	L["Aimed Shot cast bar"] = "Полоса каста Прицельного выстрела"
+	L["Allows the cast bar to show Aimed Shot casts."] = "Позволяет показывать каст Прицельного выстрела."
+	L["Multi-Shot cast bar"] = "Полоса каста Залпа"
+	L["Allows the cast bar to show Multi-Shot casts."] = "Позволяет показывать каст Залпа."
+	L["Latency bar"] = "Полоса задержки"
+	L["Shows a bar that represents latency on cast bar."] = "Показывает полосу задержки на касте."
+	L["Multi-Shot clip bar"] = "Полоса клипа Залпа"
+	L["Shows a bar that represents when a Multi-Shot would clip an Auto Shot."] = "Показывает полосу, когда Залп может клипнуть Автоматическую стрельбу."
+	L["Auto Shot delay timer"] = "Таймер задержки Автоматической стрельбы"
+	L["Shows a timer that represents when Auto shot is delayed."] = "Показывает таймер задержки Автоматической стрельбы."
+	L["Multi-Shot Clip Color"] = "Цвет клипа Залпа"
+	L["Spell Bar Unlocked"] = "Полоса заклинаний разблокирована"
+
+	-- Warrior
+	L["Warrior Settings"] = "Настройки воина"
+	L["Warrior Queueing Settings"] = "Настройки очередей воина"
+	L["Enables queued bar coloring."] = "Включает окраску полосы при очередях."
+	L["Color Main-Hand Bar"] = "Окрашивать полосу основной руки"
+	L["Enables coloring of the main-hand swing bar."] = "Включает окраску полосы основной руки."
+	L["Color Off-Hand Bar"] = "Окрашивать полосу второй руки"
+	L["Enables coloring of the off-hand swing bar."] = "Включает окраску полосы второй руки."
+	L["Queued Main-Hand Bar Color"] = "Цвет очереди основной руки"
+	L["Queued Main-Hand Bar Text Color"] = "Цвет текста очереди основной руки"
+	L["Queued Off-Hand Bar Color"] = "Цвет очереди второй руки"
+	L["Queued Off-Hand Bar Text Color"] = "Цвет текста очереди второй руки"
+
+	L["Cleave Coloring"] = "Окраска Рассекающего удара"
+	L["Enables unique coloring of heroic strikes and cleaves."] = "Включает уникальную окраску для Удара героя и Рассекающий удар."
+	L["Heroic Strike Main-Hand Bar Color"] = "Цвет Удара героя (основная рука)"
+	L["Heroic Strike Main-Hand Bar Text Color"] = "Цвет текста Удара героя (основная рука)"
+	L["Heroic Strike Off-Hand Bar Color"] = "Цвет Удара героя (вторая рука)"
+	L["Heroic Strike Off-Hand Bar Text Color"] = "Цвет текста Удара героя (вторая рука)"
+	L["Cleave Main-Hand Bar Color"] = "Цвет Рассекающего удара (основная рука)"
+	L["Cleave Main-Hand Bar Text Color"] = "Цвет текста Рассекающего удара (основная рука)"
+	L["Cleave Off-Hand Bar Color"] = "Цвет Рассекающего удара (вторая рука)"
+	L["Cleave Off-Hand Bar Text Color"] = "Цвет текста Рассекающего удара (вторая рука)"
+
+	L["Warrior Slam Settings"] = "Настройки Мощного удара воина"
+	L["Enable Slam Delay"] = "Включить задержку Мощного удара"
+	L["Enables an indicator at the end of the bar for pre-casting Slam."] = "Включает индикатор в конце полосы для пре-каста Мощного удара."
+	L["Slam Delay Bar Color"] = "Цвет полосы задержки Мощного удара"
+	L["Slam Delay"] = "Задержка Мощного удара"
+	L["Show Slam Delay While One-Handing"] = "Показывать задержку Мощного удара при двуручном владении"
+	L["Enable Slam GCD Spark"] = "Включить искру ГКД для Мощного удара"
+	L["Displays a spark 1.5s before the Slam Delay Bar."] = "Показывает искру за 1,5 сек до полосы задержки Мощного удара."
+	L["Slam Delay Duration"] = "Длительность задержки Мощного удара"
+
+	-- Common
+	L["Main-Hand"] = "Основная рука"
+	L["Off-Hand"] = "Вторая рука"
+	L["Enable"] = "Включить"
+	L["Show Off-Hand"] = "Показывать вторую руку"
+	L["Show border"] = "Показывать рамку"
+	L["Classic bars"] = "Классические полосы"
+	L["Fill / Empty"] = "Заполнение / Опустошение"
+	L["Determines if the bar is full or empty when a swing is ready."] = "Определяет, полная или пустая полоса, когда удар готов."
+	L["Show Left Text"] = "Текст слева"
+	L["Show Right Text"] = "Текст справа"
+
+	L["Bar Width"] = "Ширина полосы"
+	L["Bar Height"] = "Высота полосы"
+	L["X Offset"] = "Смещение по X"
+	L["Y Offset"] = "Смещение по Y"
+
+	L["Main-hand Bar Color"] = "Цвет полосы основной руки"
+	L["Main-hand Bar Text Color"] = "Цвет текста основной руки"
+	L["Off-hand Bar Color"] = "Цвет полосы второй руки"
+	L["Off-hand Bar Text Color"] = "Цвет текста второй руки"
+
+	L["In Combat Alpha"] = "Прозрачность в бою"
+	L["Out of Combat Alpha"] = "Прозрачность вне боя"
+	L["Backplane Alpha"] = "Прозрачность фона"
+
+	L["Bar Explanation"] = "Пояснение к полосам"
+
+	-- Spell
+	L["Auto Shot"] = "Автоматическая стрельба"
+	L["Feign Death"] = "Притвориться мёртвым"
+	L["Trueshot Aura"] = "Аура меткого выстрела"
+	L["Multi-Shot"] = "Залп"
+	L["Aimed Shot"] = "Прицельный выстрел"
+	L["Shoot"] = "Выстрел"
+	L["Quick Shots"] = "Быстрые выстрелы"
+	L["Rapid Shot"] = "Быстрая стрельба"
+	L["Berserking"] = "Берсерк"
+	L["Kiss of the Spider"] = "Поцелуй паука"
+	L["Curse of Tongues"] = "Проклятие косноязычия"
+	L["Heroic Strike"] = "Удар героя"
+	L["Cleave"] = "Рассекающий удар"
+	L["Slam"] = "Мощный удар"
 end
 
 if GetLocale() == "zhCN" then
