@@ -143,6 +143,8 @@ addon_data.localization_table = L
 	L["Heroic Strike"] = "Heroic Strike"
 	L["Cleave"] = "Cleave"
 	L["Slam"] = "Slam"
+	L["Maul"] = "Maul"
+	L["Raptor Strike"] = "Raptor Strike"
 
 if GetLocale() == "deDE" then
 	L["Thank you for installing WeaponSwingTimer Version"] = "Vielen Dank, dass Sie die WeaponSwingTimer-Version installiert haben"
