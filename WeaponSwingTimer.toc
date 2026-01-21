@@ -32,6 +32,7 @@
 ## Notes-ruRU: Отслеживает время прохождения оружия ближнего боя. Охотники с автоматическим выстрелом и палочки стреляют.
 ## Notes-zhCN: 跟踪近战武器的挥动时间猎人自动射击和魔杖射击。
 ## Notes-zhTW: 跟踪近戰武器的揮動時間獵人自動射擊和魔杖射擊。
+## IconTexture: Interface\AddOns\WeaponSwingTimer\Images\wst_logo_plain
 ## Author: LeftHandGlove, WatchYourSixx, Skad
 ## Version: 8.0.0
 ## DefaultState: enabled
