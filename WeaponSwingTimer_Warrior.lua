@@ -17,8 +17,7 @@ addon_data.warrior = {}
 
 addon_data.warrior.queued_spell_ids = addon_data.spells.GetSpellLines(
     L["Heroic Strike"], 
-    L["Cleave"], 
-    L["Slam"]
+    L["Cleave"]
 )
 
 addon_data.warrior.default_settings = {
