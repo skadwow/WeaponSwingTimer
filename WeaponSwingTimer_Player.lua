@@ -4,11 +4,20 @@ local addon_name = select(1, ...)
 local addon_data = select(2, ...)
 local L = addon_data.localization_table
 
+--[[==========================================================================================]]--
+--[[===================================== INITIALIZATION =====================================]]--
+--[[==========================================================================================]]--
+
+--- define addon structure from the above local variable
 addon_data.player = {}
 
---[[============================================================================================]]--
---[[===================================== SETTINGS RELATED =====================================]]--
---[[============================================================================================]]--
+local queuedSpellIDs = {}
+for _, spell_id in ipairs(addon_data.spells.GetSpellIDs(L["Heroic Strike"], L["Cleave"])) do
+    queuedSpellIDs[spell_id] = true
+end
+
+local MAINHAND_SLOT = ItemLocation:CreateFromEquipmentSlot(INVSLOT_MAINHAND)
+local OFFHAND_SLOT = ItemLocation:CreateFromEquipmentSlot(INVSLOT_OFFHAND)
 
 addon_data.player.default_settings = {
     enabled = true,
@@ -52,9 +61,15 @@ addon_data.player.off_swing_timer = 0.00001
 addon_data.player.prev_off_weapon_speed = 2
 addon_data.player.off_weapon_speed = 2
 addon_data.player.off_weapon_id = GetInventoryItemID("player", 17)
-addon_data.player.has_offhand = false
-addon_data.player.has_twohand = false
 addon_data.player.off_speed_changed = false
+
+addon_data.player.ranged_weapon_id = GetInventoryItemID("player", 18)
+
+addon_data.player.has_twohand = false
+addon_data.player.has_offhand = false
+addon_data.player.has_shield = false
+addon_data.player.swap_time = nil
+addon_data.player.delay_offhand = false
 
 function addon_data.player.LoadSettings()
     -- If the carried over settings dont exist then make them
@@ -117,20 +132,41 @@ function addon_data.player.OnUpdate(elapsed)
 end
 
 function addon_data.player.OnInventoryChange()
-    local new_main_guid = GetInventoryItemID("player", 16)
-    local new_off_guid = GetInventoryItemID("player", 17)
+    local new_main_guid = GetInventoryItemID("player", INVSLOT_MAINHAND)
+    local new_off_guid = GetInventoryItemID("player", INVSLOT_OFFHAND)
+    local new_ranged_guid = GetInventoryItemID("player", INVSLOT_RANGED)
+
+    local resetTimers = false
+
     -- Check for a main hand weapon change
     if addon_data.player.main_weapon_id ~= new_main_guid then
+        addon_data.player.main_weapon_id = new_main_guid
         addon_data.player.UpdateMainWeaponSpeed()
-        addon_data.player.ResetMainSwingTimer()
+        resetTimers = true
     end
-    addon_data.player.main_weapon_id = new_main_guid
     -- Check for an off hand weapon change
     if addon_data.player.off_weapon_id ~= new_off_guid then
+        addon_data.player.off_weapon_id = new_off_guid
         addon_data.player.UpdateOffWeaponSpeed()
-        addon_data.player.ResetOffSwingTimer()
+        resetTimers = true
     end
-    addon_data.player.off_weapon_id = new_off_guid
+    -- Check for a ranged weapon change
+    if addon_data.player.ranged_weapon_id ~= new_ranged_guid then
+        addon_data.player.ranged_weapon_id = new_ranged_guid
+        resetTimers = true
+    end
+
+    if resetTimers then
+        addon_data.player.ResetMainSwingTimer()
+        addon_data.player.ResetOffSwingTimer()
+        if addon_data.player.swap_time then
+            local elapsed = GetTime() - addon_data.player.swap_time
+            if elapsed < 1 then -- arbitrary 1s bound for SPELL_UPDATE_COOLDOWN event being related to weapon swap
+                addon_data.player.UpdateMainSwingTimer(elapsed)
+                addon_data.player.UpdateOffSwingTimer(elapsed)
+            end
+        end
+    end
 end
 
 function addon_data.player.OnCombatLogUnfiltered(...)
@@ -146,19 +182,31 @@ function addon_data.player.OnCombatLogUnfiltered(...)
     if subevent == "SWING_DAMAGE" then
         local isOffHand = select(21, ...)
         if isOffHand then
+            addon_data.player.delay_offhand = false
             addon_data.player.ResetOffSwingTimer()
         else
             if (addon_data.player.extra_attacks_flag == false) then
                 addon_data.player.ResetMainSwingTimer()
+                if addon_data.player.has_shield then
+                    addon_data.player.delay_offhand = true
+                end
             end
             addon_data.player.extra_attacks_flag = false
         end
     elseif subevent == "SWING_MISSED" then
         local missType = select(12, ...)
         local isOffHand = select(13, ...)
+        if addon_data.player.has_shield then
+            addon_data.player.delay_offhand = true
+        elseif isOffHand then
+            addon_data.player.delay_offhand = false
+        end
         addon_data.core.MissHandler("player", missType, isOffHand)
     elseif subevent == "SPELL_DAMAGE" or subevent == "SPELL_MISSED" then
         local spellID = select(12, ...)
+        if addon_data.player.has_shield and queuedSpellIDs[spellID] then
+            addon_data.player.delay_offhand = true
+        end
         addon_data.core.SpellHandler("player", spellID)
     end
 end
@@ -170,6 +218,20 @@ end
 function addon_data.player.ResetOffSwingTimer()
     if addon_data.player.has_offhand then
         addon_data.player.off_swing_timer = addon_data.player.off_weapon_speed
+    end
+end
+
+function addon_data.player.DelayOffSwingTimer()
+    if addon_data.player.has_offhand then
+        addon_data.player.off_swing_timer = addon_data.player.main_weapon_speed + addon_data.player.off_weapon_speed / 2
+    end
+end
+
+function addon_data.player.OnSpellUpdateCooldown(spellID)
+    -- nil, 3018 (shoot), and 2764 (throw) fire on a weapon or ranged swap in combat
+    -- 3018 (shoot) and 2764 (throw) fire on a weapon swap out of combat
+    if spellID == nil or spellID == 3018 then
+        addon_data.player.swap_time = GetTime()
     end
 end
 
@@ -217,32 +279,30 @@ end
 function addon_data.player.UpdateMainWeaponSpeed()
     addon_data.player.prev_main_weapon_speed = addon_data.player.main_weapon_speed
     addon_data.player.main_weapon_speed, _ = UnitAttackSpeed("player")
+    if C_Item.DoesItemExist(MAINHAND_SLOT) then
+        addon_data.player.has_twohand = C_Item.GetItemInventoryType(MAINHAND_SLOT) == Enum.InventoryType.Index2HweaponType
+    end
     if addon_data.player.main_weapon_speed ~= addon_data.player.prev_main_weapon_speed then
         addon_data.player.main_speed_changed = true
     else
         addon_data.player.main_speed_changed = false
     end
-    if GetInventoryItemID("player", INVSLOT_MAINHAND) ~= nil then
-        if C_Item.GetItemInventoryType(ItemLocation:CreateFromEquipmentSlot(INVSLOT_MAINHAND)) == 17 then
-            addon_data.player.has_twohand = true
-        else
-            addon_data.player.has_twohand = false
-        end
-    end
 end
 
 function addon_data.player.UpdateOffWeaponSpeed()
-    if addon_data.player.off_weapon_speed == nil then
-        addon_data.player.prev_off_weapon_speed = 2
-    else
-        addon_data.player.prev_off_weapon_speed = addon_data.player.off_weapon_speed
-    end
+    addon_data.player.prev_off_weapon_speed = addon_data.player.off_weapon_speed or 2
     _, addon_data.player.off_weapon_speed = UnitAttackSpeed("player")
-    -- Check to see if we have an off-hand
-    if (not addon_data.player.off_weapon_speed) or (addon_data.player.off_weapon_speed == 0) then
-        addon_data.player.has_offhand = false
+    if C_Item.DoesItemExist(OFFHAND_SLOT) then
+        local itemType = C_Item.GetItemInventoryType(OFFHAND_SLOT)
+        addon_data.player.has_shield = itemType == Enum.InventoryType.IndexShieldType
+        addon_data.player.has_offhand = itemType == Enum.InventoryType.IndexWeaponType or 
+                                        itemType == Enum.InventoryType.IndexWeaponoffhandType
     else
-        addon_data.player.has_offhand = true
+        addon_data.player.has_shield = false
+        addon_data.player.has_offhand = false
+    end
+    if addon_data.player.has_offhand and addon_data.player.delay_offhand then
+        addon_data.player.off_weapon_speed = addon_data.player.main_weapon_speed + addon_data.player.off_weapon_speed / 2
     end
     if addon_data.player.off_weapon_speed ~= addon_data.player.prev_off_weapon_speed then
         addon_data.player.off_speed_changed = true

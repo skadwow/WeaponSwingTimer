@@ -13,7 +13,7 @@ addon_data.core.all_timers = {
     addon_data.player, addon_data.target
 }
 
-local version = "2.0.7"
+local version = "2.0.8"
 
 local load_message = L["Thank you for installing WeaponSwingTimer Version"] .. " " .. version .. 
                     " " .. L["by Skad! Use |cFFFFC300/wst|r for more options."]
@@ -200,6 +200,7 @@ local function OnAddonLoaded(self)
     addon_data.core.core_frame:RegisterEvent("UNIT_SPELLCAST_FAILED_QUIET")
     addon_data.core.core_frame:RegisterEvent("UNIT_SPELLCAST_SENT")
     addon_data.core.core_frame:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
+    addon_data.core.core_frame:RegisterEvent("SPELL_UPDATE_COOLDOWN")
     -- Load the settings for the core and all timers
     LoadAllSettings()
     InitializeAllVisuals()
@@ -235,6 +236,8 @@ local function CoreFrame_OnEvent(self, event, ...)
         addon_data.hunter.OnStartAutorepeatSpell()
     elseif event == "STOP_AUTOREPEAT_SPELL" then
         addon_data.hunter.OnStopAutorepeatSpell()
+    elseif event == "SPELL_UPDATE_COOLDOWN" then
+        addon_data.player.OnSpellUpdateCooldown(args[1])
     elseif event == "UNIT_INVENTORY_CHANGED" then
         addon_data.player.OnInventoryChange()
         addon_data.target.OnInventoryChange()

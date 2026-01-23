@@ -136,7 +136,7 @@ function addon_data.config.SliderFactory(g_name, parent, title, min_val, max_val
     editbox:SetSize(45, 30)
     editbox:ClearAllPoints()
     editbox:SetPoint("LEFT", slider, "RIGHT", 15, 0)
-    editbox:SetText(slider:GetValue())
+    editbox:SetText(tostring(slider:GetValue()))
     editbox:SetAutoFocus(false)
     slider:SetScript("OnValueChanged", function(self)
         editbox:SetText(tostring(addon_data.utils.SimpleRound(self:GetValue(), val_step)))
