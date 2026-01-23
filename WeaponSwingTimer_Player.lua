@@ -158,7 +158,11 @@ function addon_data.player.OnInventoryChange()
 
     if resetTimers then
         addon_data.player.ResetMainSwingTimer()
-        addon_data.player.ResetOffSwingTimer()
+        if addon_data.player.delay_offhand then
+            addon_data.player.DelayOffSwingTimer()
+        else
+            addon_data.player.ResetOffSwingTimer()
+        end
         if addon_data.player.swap_time then
             local elapsed = GetTime() - addon_data.player.swap_time
             if elapsed < 1 then -- arbitrary 1s bound for SPELL_UPDATE_COOLDOWN event being related to weapon swap
@@ -237,7 +241,7 @@ end
 
 function addon_data.player.LimitOffSwingTimer()
     if addon_data.player.has_offhand then
-        addon_data.player.off_swing_timer = max(addon_data.player.off_swing_timer, 0.6*addon_data.player.off_weapon_speed)
+        addon_data.player.off_swing_timer = max(addon_data.player.off_swing_timer, 0.55*addon_data.player.off_weapon_speed)
     end
 end
 
@@ -300,9 +304,6 @@ function addon_data.player.UpdateOffWeaponSpeed()
     else
         addon_data.player.has_shield = false
         addon_data.player.has_offhand = false
-    end
-    if addon_data.player.has_offhand and addon_data.player.delay_offhand then
-        addon_data.player.off_weapon_speed = addon_data.player.main_weapon_speed + addon_data.player.off_weapon_speed / 2
     end
     if addon_data.player.off_weapon_speed ~= addon_data.player.prev_off_weapon_speed then
         addon_data.player.off_speed_changed = true
