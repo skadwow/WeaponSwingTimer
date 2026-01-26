@@ -133,9 +133,25 @@ function addon_data.config.SliderFactory(g_name, parent, title, min_val, max_val
     slider:SetValueStep(val_step)
     slider:SetObeyStepOnDrag(true)
     slider:SetWidth(150)
+
+    slider.TopText = addon_data.config.TextFactory(slider, title, 12)
+    slider.TopText:ClearAllPoints()
+    slider.TopText:SetPoint("BOTTOM", slider, "TOP", 0, 0)
+    slider.TopText:Show()
+
+    slider.LeftText = addon_data.config.TextFactory(slider, tostring(min_val), 12)
+    slider.LeftText:ClearAllPoints()
+    slider.LeftText:SetPoint("RIGHT", slider, "LEFT", -2, 0)
+    slider.LeftText:Show()
+
+    slider.RightText = addon_data.config.TextFactory(slider, tostring(max_val), 12)
+    slider.RightText:ClearAllPoints()
+    slider.RightText:SetPoint("LEFT", slider, "RIGHT", 2, 0)
+    slider.RightText:Show()
+
     editbox:SetSize(45, 30)
     editbox:ClearAllPoints()
-    editbox:SetPoint("LEFT", slider, "RIGHT", 15, 0)
+    editbox:SetPoint("LEFT", slider, "RIGHT", 30, 1)
     editbox:SetText(tostring(slider:GetValue()))
     editbox:SetAutoFocus(false)
     slider:SetScript("OnValueChanged", function(self)

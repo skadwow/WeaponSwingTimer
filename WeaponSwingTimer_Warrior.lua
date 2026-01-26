@@ -39,7 +39,7 @@ addon_data.warrior.default_settings = {
     slam_delay_bar = true,
     slam_delay = 0.100,
     slam_delay_r = 0.9, slam_delay_g = 0.1, slam_delay_b = 0, slam_delay_a = 1.0,
-    slam_delay_dual_wielding = false,
+    slam_delay_one_handing = false,
     slam_gcd_spark = true,
 }
 
@@ -233,8 +233,12 @@ function addon_data.warrior.UpdateVisualsOnUpdate()
     frame.slam_delay_bar:SetVertexColor(settings.slam_delay_r, settings.slam_delay_g, settings.slam_delay_b, settings.slam_delay_a)
     frame.slam_gcd_spark:SetPoint("RIGHT", frameWidth * -1.5 / addon_data.player.main_weapon_speed + 8, 0)
     frame.slam_gcd_spark:SetVertexColor(settings.slam_delay_r, settings.slam_delay_g, settings.slam_delay_b, settings.slam_delay_a)
-    if settings.slam_delay_enabled and (addon_data.player.has_twohand or settings.slam_delay_dual_wielding) then
-        frame.slam_delay_bar:Show()
+    if addon_data.player.has_twohand or settings.slam_delay_one_handing then
+        if settings.slam_delay_enabled and settings.slam_delay > 0 then
+            frame.slam_delay_bar:Show()
+        else
+            frame.slam_delay_bar:Hide()
+        end
         if settings.slam_gcd_spark then
             frame.slam_gcd_spark:Show()
         else
@@ -261,8 +265,12 @@ function addon_data.warrior.UpdateVisualsOnSettingsChange()
     frame.slam_delay_bar:SetVertexColor(settings.slam_delay_r, settings.slam_delay_g, settings.slam_delay_b, settings.slam_delay_a)
     frame.slam_gcd_spark:SetPoint("RIGHT", frameWidth * -1.5 / addon_data.player.main_weapon_speed + 8, 0)
     frame.slam_gcd_spark:SetVertexColor(settings.slam_delay_r, settings.slam_delay_g, settings.slam_delay_b, settings.slam_delay_a)
-    if settings.slam_delay_enabled and (addon_data.player.has_twohand or settings.slam_delay_dual_wielding) then
-        frame.slam_delay_bar:Show()
+    if addon_data.player.has_twohand or settings.slam_delay_one_handing then
+        if settings.slam_delay_enabled and settings.slam_delay > 0 then
+            frame.slam_delay_bar:Show()
+        else
+            frame.slam_delay_bar:Hide()
+        end
         if settings.slam_gcd_spark then
             frame.slam_gcd_spark:Show()
         else
@@ -355,7 +363,7 @@ function addon_data.warrior.UpdateConfigPanelValues()
     displayCleave(settings.cleave)
 
     panel.enable_slam_delay:SetChecked(settings.slam_delay_enabled)
-    panel.enable_slam_delay_dual_wielding:SetChecked(settings.slam_delay_dual_wielding)
+    panel.enable_slam_delay_one_handing:SetChecked(settings.slam_delay_one_handing)
     panel.enable_slam_gcd_spark:SetChecked(settings.slam_gcd_spark)
     panel.slam_delay_color_picker.foreground:SetColorTexture(
         settings.slam_delay_r, settings.slam_delay_g, settings.slam_delay_b, settings.slam_delay_a)
@@ -499,7 +507,7 @@ function addon_data.warrior.EnableSlamDelayCheckBoxOnClick(self)
 end
 
 function addon_data.warrior.EnableSlamDelayDuelWieldingCheckBoxOnClick(self)
-    character_warrior_settings.slam_delay_dual_wielding = self:GetChecked()
+    character_warrior_settings.slam_delay_one_handing = self:GetChecked()
     addon_data.warrior.UpdateVisualsOnSettingsChange()
 end
 
@@ -660,13 +668,13 @@ function addon_data.warrior.CreateConfigPanel(parent_panel)
     panel.enable_slam_delay:SetPoint("TOPLEFT", 10, -260)
 
     -- Enable Slam Delay Dual Wielding Checkbox
-    panel.enable_slam_delay_dual_wielding = addon_data.config.CheckBoxFactory(
+    panel.enable_slam_delay_one_handing = addon_data.config.CheckBoxFactory(
         "WarriorEnableSlamDelayDualWieldingCheckBox",
         panel,
         L["Show Slam Delay While One-Handing"],
         nil,
         addon_data.warrior.EnableSlamDelayDuelWieldingCheckBoxOnClick)
-    panel.enable_slam_delay_dual_wielding:SetPoint("TOPLEFT", 10, -280)
+    panel.enable_slam_delay_one_handing:SetPoint("TOPLEFT", 10, -280)
 
     -- Enable Slam Delay Checkbox
     panel.enable_slam_gcd_spark = addon_data.config.CheckBoxFactory(
@@ -685,11 +693,6 @@ function addon_data.warrior.CreateConfigPanel(parent_panel)
         L["Slam Delay Bar Color"],
         addon_data.warrior.SlamDelayColorPickerOnClick)
     panel.slam_delay_color_picker:SetPoint("TOPLEFT", 205, -290)
-
-    -- Slam Delay Slider Label
-    panel.slam_delay_label = addon_data.config.TextFactory(panel, L["Slam Delay Duration"], 14)
-    panel.slam_delay_label:SetPoint("TOPLEFT", 420, -270)
-    panel.slam_delay_label:SetTextColor(1, 0.82, 0, 1)
 
     -- Slam delay Slider
     panel.slam_delay_slider = addon_data.config.SliderFactory(
