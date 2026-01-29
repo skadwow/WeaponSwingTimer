@@ -7,6 +7,7 @@ local L = addon_data.localization_table
 spells = {}
 addon_data.spells = spells
 
+---@type table<SpellID, SpellLine>
 spells.spellInfo = {}
 
 -- Hunter
@@ -65,7 +66,6 @@ if addon_data.utils.IsClassicWow() then
     spells.spellInfo[9745] = {name = L["Maul"], rank = 5, castTime = nil, cooldown = nil}
     spells.spellInfo[9880] = {name = L["Maul"], rank = 6, castTime = nil, cooldown = nil}
     spells.spellInfo[9881] = {name = L["Maul"], rank = 7, castTime = nil, cooldown = nil}
-
 elseif addon_data.utils.IsTbcWow() then
     -- Hunter
     spells.spellInfo[19506] = {name = L["Trueshot Aura"], rank = 1, castTime = nil, cooldown = nil}
@@ -206,6 +206,8 @@ elseif addon_data.utils.IsWrathWow() then
     spells.spellInfo[48480] = {name = L["Maul"], rank = 10, castTime = nil, cooldown = nil}
 end
 
+---@param name string
+---@return table<SpellID, SpellLine>
 local function GetSpellLines(name)
     local spellLines = {}
     for spellID, spellInfo in pairs(spells.spellInfo) do
@@ -216,11 +218,13 @@ local function GetSpellLines(name)
     return spellLines
 end
 
+---@param name string
+---@return table<SpellID, true>
 local function GetSpellIDs(name)
     local spellIDs = {}
     for spellID, spellInfo in pairs(spells.spellInfo) do
         if spellInfo.name == name then
-            tinsert(spellIDs, spellID)
+            spellIDs[spellID] = true
         end
     end
     return spellIDs
@@ -228,6 +232,7 @@ end
 
 ---Returns spell lines for each spell named.
 ---@param ... string -- Localized spell names
+---@return table<SpellID, SpellLine>
 function addon_data.spells.GetSpellLines(...)
     local args = {...}
     if #args == 1 then
@@ -245,6 +250,7 @@ end
 
 ---Returns spell IDs for each spell named.
 ---@param ... string -- Localized spell names
+---@return table<SpellID, true>
 function addon_data.spells.GetSpellIDs(...)
     local args = {...}
     if #args == 1 then
@@ -252,8 +258,8 @@ function addon_data.spells.GetSpellIDs(...)
     else
         local spellIDs = {}
         for _, name in ipairs(args) do
-            for _, spellID in ipairs(GetSpellIDs(name)) do
-                tinsert(spellIDs, spellID)
+            for spellID, _ in pairs(GetSpellIDs(name)) do
+                spellIDs[spellID] = true
             end
         end
         return spellIDs

@@ -11,10 +11,8 @@ local L = addon_data.localization_table
 --- define addon structure from the above local variable
 addon_data.player = {}
 
-local queuedSpellIDs = {}
-for _, spell_id in ipairs(addon_data.spells.GetSpellIDs(L["Heroic Strike"], L["Cleave"])) do
-    queuedSpellIDs[spell_id] = true
-end
+local queuedSpellIDs = addon_data.spells.GetSpellIDs(L["Heroic Strike"], L["Cleave"])
+local slamIDs = addon_data.spells.GetSpellIDs(L["Slam"])
 
 local MAINHAND_SLOT = ItemLocation:CreateFromEquipmentSlot(INVSLOT_MAINHAND)
 local OFFHAND_SLOT = ItemLocation:CreateFromEquipmentSlot(INVSLOT_OFFHAND)
@@ -70,6 +68,8 @@ addon_data.player.has_offhand = false
 addon_data.player.has_shield = false
 addon_data.player.swap_time = nil
 addon_data.player.delay_offhand = false
+
+addon_data.player.slam_queued_duration = 0
 
 function addon_data.player.LoadSettings()
     -- If the carried over settings dont exist then make them
@@ -189,7 +189,7 @@ function addon_data.player.OnCombatLogUnfiltered(...)
             addon_data.player.delay_offhand = false
             addon_data.player.ResetOffSwingTimer()
         else
-            if (addon_data.player.extra_attacks_flag == false) then
+            if not addon_data.player.extra_attacks_flag then
                 addon_data.player.ResetMainSwingTimer()
                 if addon_data.player.has_shield then
                     addon_data.player.delay_offhand = true
@@ -239,6 +239,30 @@ function addon_data.player.OnSpellUpdateCooldown(spellID)
     end
 end
 
+local function CheckSlamOverflow(unit, spell_id)
+    if unit ~= "player" then return end
+
+    if slamIDs[spell_id] then
+        if addon_data.player.main_swing_timer == 0 and C_Spell.IsCurrentSpell(6603) then
+            addon_data.player.ResetMainSwingTimer()
+            addon_data.player.UpdateMainSwingTimer(addon_data.player.slam_queued_duration)
+        end
+        addon_data.player.slam_queued_duration = 0
+    end
+end
+
+function addon_data.player.OnUnitSpellCastInterrupted(unit, spell_id)
+    CheckSlamOverflow(unit, spell_id)
+end
+
+function addon_data.player.OnUnitSpellCastFailed(unit, spell_id)
+    CheckSlamOverflow(unit, spell_id)
+end
+
+function addon_data.player.OnUnitSpellCastFailedQuiet(unit, spell_id)
+    CheckSlamOverflow(unit, spell_id)
+end
+
 function addon_data.player.LimitOffSwingTimer()
     if addon_data.player.has_offhand then
         addon_data.player.off_swing_timer = max(addon_data.player.off_swing_timer, 0.55*addon_data.player.off_weapon_speed)
@@ -246,6 +270,7 @@ function addon_data.player.LimitOffSwingTimer()
 end
 
 function addon_data.player.OnPlayerTargetChanged()
+    addon_data.player.extra_attacks_flag = false
     addon_data.player.LimitOffSwingTimer()
 end
 
@@ -260,6 +285,10 @@ function addon_data.player.UpdateMainSwingTimer(elapsed)
             addon_data.player.main_swing_timer = addon_data.player.main_swing_timer - elapsed
             if addon_data.player.main_swing_timer < 0 then
                 addon_data.player.main_swing_timer = 0
+            end
+        else
+            if C_Spell.IsCurrentSpell(L["Slam"]) then
+                addon_data.player.slam_queued_duration = addon_data.player.slam_queued_duration + elapsed
             end
         end
     end

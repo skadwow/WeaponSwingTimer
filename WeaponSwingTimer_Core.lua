@@ -13,7 +13,7 @@ addon_data.core.all_timers = {
     addon_data.player, addon_data.target
 }
 
-local version = "2.0.10"
+local version = "2.1.0"
 
 local load_message = L["Thank you for installing WeaponSwingTimer Version"] .. " " .. version .. 
                     " " .. L["by Skad! Use |cFFFFC300/wst|r for more options."]
@@ -172,15 +172,13 @@ end
 
 function addon_data.core.SpellHandler(unit, spell_id)
     local _, player_class, _ = UnitClass("player")
-    for _, curr_spell_id in ipairs(swing_reset_spells[player_class]) do
-        if spell_id == curr_spell_id then
-            if unit == "player" then
-                addon_data.player.ResetMainSwingTimer()
-            elseif unit == "target" then
-                addon_data.target.ResetMainSwingTimer()
-            else
-                addon_data.utils.PrintMsg(L["Unexpected Unit Type in SpellHandler()."])
-            end
+    if swing_reset_spells[player_class][spell_id] then
+        if unit == "player" then
+            addon_data.player.ResetMainSwingTimer()
+        elseif unit == "target" then
+            addon_data.target.ResetMainSwingTimer()
+        else
+            addon_data.utils.PrintMsg(L["Unexpected Unit Type in SpellHandler()."])
         end
     end
 end
@@ -243,6 +241,7 @@ local function CoreFrame_OnEvent(self, event, ...)
         addon_data.target.OnInventoryChange()
         addon_data.hunter.OnInventoryChange()
     elseif event == "UNIT_SPELLCAST_INTERRUPTED" then
+        addon_data.player.OnUnitSpellCastInterrupted(args[1], args[3])
         addon_data.warrior.OnUnitSpellCastInterrupted(args[1], args[3])
         addon_data.hunter.OnUnitSpellCastInterrupted(args[1], args[3])
         addon_data.castbar.OnUnitSpellCastInterrupted(args[1], args[3])
@@ -253,9 +252,11 @@ local function CoreFrame_OnEvent(self, event, ...)
         addon_data.hunter.OnUnitSpellCastSucceeded(args[1], args[3])
         addon_data.castbar.OnUnitSpellCastSucceeded(args[1], args[3])
     elseif event == "UNIT_SPELLCAST_FAILED" then
+        addon_data.player.OnUnitSpellCastFailed(args[1], args[3])
         addon_data.warrior.OnUnitSpellCastFailed(args[1], args[3])
         addon_data.castbar.OnUnitSpellCastFailed(args[1], args[3])
     elseif event == "UNIT_SPELLCAST_FAILED_QUIET" then
+        addon_data.player.OnUnitSpellCastFailedQuiet(args[1], args[3])
         addon_data.warrior.OnUnitSpellCastFailedQuiet(args[1], args[3])
         addon_data.hunter.OnUnitSpellCastFailedQuiet(args[1], args[3])
     end
